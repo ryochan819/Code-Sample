@@ -27,6 +27,11 @@ namespace Gacha.gameplay
                 UIEventSystem.ChangeUIInterfaceState(GameSceneInterfaceManager.GameStates.phone);
             }
 
+            HandleInteractableDetection();
+        }
+
+        private void HandleInteractableDetection()
+        {
             // Prioritized layers:
             LayerMask priorityMask = LayerMask.GetMask("GachaMachine");
 
