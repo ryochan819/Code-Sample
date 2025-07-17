@@ -82,13 +82,15 @@ namespace Gacha.gameplay
             {
                 characterData.CharacterName = "localPlayer";
                 DataPersistenceManager.instance.SaveData.localPlayerData = new PlayerData("", characterData);
-                GameSceneDataManager.instance.PlayerDataUpdate("", cc_CharacterDataNetwork, localPlayer);
+                // SendCharacterDataToServerRpc("", cc_CharacterDataNetwork, localPlayer);
             }
             else
             {
                 string playerSteamID = Steamworks.SteamUser.GetSteamID().ToString();
                 characterData.CharacterName = playerSteamID;
-                SendCharacterDataToServerRpc(playerSteamID, cc_CharacterDataNetwork, localPlayer);
+                
+                if (GameManager.isMultiplayer)
+                    SendCharacterDataToServerRpc(playerSteamID, cc_CharacterDataNetwork, localPlayer);
             }
 
             var prefabToSpawn = characterData.CharacterPrefab.Contains("Female")? femalePlayerPrefab : malePlayerPrefab;

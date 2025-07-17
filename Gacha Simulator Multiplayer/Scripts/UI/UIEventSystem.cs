@@ -1,4 +1,5 @@
 using System;
+using Gacha.gameplay;
 using UnityEngine;
 
 namespace Gacha.ui
@@ -27,6 +28,24 @@ namespace Gacha.ui
         public static void ClosePhoneMenu()
         {
             onClosePhoneMenu?.Invoke();
+        }
+
+        public static Action<InteractableTypeList> onTargetingIInteractable;
+        public static void SwitchInteractableUI(InteractableTypeList interactableType)
+        {
+            onTargetingIInteractable?.Invoke(interactableType);
+        }
+
+        public static event Action<float> SetRightClickHoldRing;
+        public static void SetRightClickHoldRingEvent(float value)
+        {
+            SetRightClickHoldRing?.Invoke(value);
+        }
+        
+        public static event Action<bool> onCenterDotToggle;
+        public static void SetCenterDotToggle(bool value)
+        {
+            onCenterDotToggle?.Invoke(value);
         }
     }
 }

@@ -1,5 +1,5 @@
-using Gacha.ui;
 using PrimeTween;
+using PurrNet;
 using UnityEngine;
 
 namespace Gacha.gameplay
@@ -25,25 +25,38 @@ namespace Gacha.gameplay
 
             HandleBuilding();
         }
-        
+
         public void HandleBuilding()
         {
-            if (!BuildManager.Instance.IsPlacing || BuildManager.Instance.CurrentPreview == null) return;
+            if (!controller.BuildManager.IsPlacing || controller.BuildManager.CurrentPreview == null) return;
 
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, 100f, BuildManager.Instance.BuildableSurfaces))
+            if (Physics.Raycast(ray, out RaycastHit hit, 100f, controller.BuildManager.BuildableSurfaces))
             {
-                Tween.Position(BuildManager.Instance.CurrentPreview.transform, hit.point, 0.1f);
+                controller.BuildManager.UpdatePreviewObjectPosition(hit);
             }
 
             if (Input.GetKeyDown(KeyCode.R))
-                BuildManager.Instance.CurrentPreview.transform.Rotate(0, 90, 0);
+                controller.BuildManager.CurrentPreview.transform.Rotate(0, 90, 0);
 
             if (Input.GetMouseButtonDown(0))
-                BuildManager.Instance.ConfirmPlacement();
+                controller.BuildManager.ConfirmPlacement();
 
             if (Input.GetMouseButtonDown(1))
-                BuildManager.Instance.LeaveBuildMode();
+                controller.BuildManager.LeaveBuildMode();
+                
+            float mouseScrollWheel = Input.GetAxis("Mouse ScrollWheel");
+            if (controller.BuildManager.CurrentPreview != null)
+            {
+                if (mouseScrollWheel < 0)
+                {
+                    controller.BuildManager.AdjustPlacementRotation(15);
+                }
+                else if (mouseScrollWheel > 0)
+                {
+                    controller.BuildManager.AdjustPlacementRotation(-15);
+                }
+            }
         }
 
         public override void handleMovement()

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using CC;
 using Cysharp.Threading.Tasks;
 using Gacha.system;
@@ -21,13 +22,6 @@ namespace Gacha.gameplay
             if (asServer) return;
 
             isOnSpawned = true;
-
-            if (localPlayer != owner && !appearenceSetup)
-            {
-                Debug.Log("Local player is not the owner, local player ID: " + localPlayer.Value.id + ", owner ID: " + owner.Value.id);
-                CC_CharacterDataNetwork characterData = GameSceneDataManager.instance.GetPlayerCharacterData(owner.Value.id);
-                SetAppearenceObservers(characterData);
-            }
         }
 
         public async UniTask SetAppearence(CC_CharacterDataNetwork cc_CharacterNetworkData)

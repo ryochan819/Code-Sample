@@ -1,32 +1,91 @@
-using System;
 using Gacha.system;
 using UnityEngine;
 using PurrNet;
+using Unity.Cinemachine;
+using Gacha.ui;
 
 namespace Gacha.gameplay
 {
-    public class GachaMachine : NetworkBehaviour
+    public class GachaMachine : NetworkBehaviour, IInteractableWithCancel
     {
         [Header("Machine Setting")]
         CapsuleToySetData capsuleToySetOnMachine;
+        public CapsuleToySetData CapsuleToySetOnMachine => capsuleToySetOnMachine;
         int currentToyInsideMachine = 0;
         int currentCoins;
         int requiredCoins = 5;
         [SerializeField] Transform capsuleSpawnPoint;
         [SerializeField] GameObject coverPoster;
+        int machineGroundLevel = 0;
+        bool machineTopOccupied = false;
+        [SerializeField] Transform topSnapPosition;
+        public Transform TopSnapPosition => topSnapPosition;
+        public InteractableTypeList InteractableType => InteractableTypeList.GachaMachine;
+        Outline outline;
+
+        [Header("Player Interaction")]
+        [SerializeField] CinemachineCamera gachaCineCam;
+        [SerializeField] GameObject tunnelCollider;
+        [SerializeField] Collider handleCollider;
+        [SerializeField] Collider coinInsertCollider;
 
         [Header("Npc Interaction")]
-        bool isNPCInteracting;
-        public bool IsNPCInteracting
+        SyncVar<bool> isInteracting = new(false);
+        public bool IsInteracting
         {
-            get { return isNPCInteracting; }
-            set { isNPCInteracting = value; }
+            get { return isInteracting.value; }
+            set { isInteracting.value = value; }
         }
 
         [Header("Special Rules")]
         public bool isMenu = false;
 
-        public event Action OnCapsuleSpawned;
+        public bool Interact()
+        {
+            if (!isInteracting.value)
+            {
+                // Check if player is in front of the machine
+                Vector3 toPlayer = (GameSceneDataManager.instance.LocalPlayer.transform.position - gameObject.transform.position).normalized;
+                float dot = Vector3.Dot(gameObject.transform.forward, toPlayer);
+
+                if (dot < 0f)
+                {
+                    // Show warning
+                    Debug.Log("Player is behind the object.");
+                    return false;
+                }
+
+                isInteracting.value = true;
+
+                GameEventSystem.CameraBlendUpdate(BlendMode.EaseInOut, 0.5f);
+
+                gachaCineCam.enabled = true;
+                gachaCineCam.Priority = 10;
+                tunnelCollider.SetActive(true);
+                handleCollider.enabled = true;
+                coinInsertCollider.enabled = true;
+                EnableOutline(false);
+
+                GameSceneDataManager.instance.LocalPlayer.InteractManager.SetCurrentInteractingInteractable(this);
+                
+                GameEventSystem.SwitchPlayerState(PlayerState.gacha);
+                UIEventSystem.ChangeUIInterfaceState(GameSceneInterfaceManager.GameStates.gacha);
+
+                return true;
+            }
+            return false;
+        }
+
+        public void CancelInteraction()
+        {
+            isInteracting.value = false;
+
+            gachaCineCam.Priority = 0;
+            gachaCineCam.enabled = false;
+            tunnelCollider.SetActive(false);
+            handleCollider.enabled = false;
+            coinInsertCollider.enabled = false;
+        }
 
         public void SetCapsuleMachineToySet(CapsuleToySetData capsuleToySet)
         {
@@ -85,9 +144,28 @@ namespace Gacha.gameplay
             }
         }
 
+        public bool CanSnapOnTop()
+        {
+            return !machineTopOccupied && machineGroundLevel < 2;
+        }
+
+        public int GetMachineGroundLevel()
+        {
+            return machineGroundLevel;
+        }
+
         public void Reset()
         {
             currentCoins = 0;
+        }
+
+        public void EnableOutline(bool enable)
+        {
+            if (outline == null)
+                outline = GetComponent<Outline>();
+
+            if (outline != null && outline.enabled != enable)
+                outline.enabled = enable;
         }
     }
 }

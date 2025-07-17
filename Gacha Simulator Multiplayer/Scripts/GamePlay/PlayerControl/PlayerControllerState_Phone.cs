@@ -13,6 +13,9 @@ namespace Gacha.gameplay
         public override void EnterState()
         {
             base.EnterState();
+            
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
 
         public override void handleInput()

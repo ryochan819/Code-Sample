@@ -37,7 +37,7 @@ namespace PurrLobby
             gameNetworkPrefabsWithMods.prefabs = localNetworkPrefabs.prefabs
             .Select(p =>
             {
-                Debug.Log($"[PrefabSetup] Prefab: {p.prefab.name}, Pooled: {p.pooled}, WarmupCount: {p.warmupCount}");
+                // Debug.Log($"[PrefabSetup] Prefab: {p.prefab.name}, Pooled: {p.pooled}, WarmupCount: {p.warmupCount}");
 
                 return new NetworkPrefabs.UserPrefabData
                 {

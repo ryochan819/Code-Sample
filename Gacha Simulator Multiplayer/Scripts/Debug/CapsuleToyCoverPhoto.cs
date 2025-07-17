@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System.IO;
 using Gacha.gameplay;
 using UnityEditor;
@@ -28,3 +29,4 @@ public class CapsuleToyCoverPhoto : MonoBehaviour
         Debug.Log("Screenshot saved to: " + fullPath);
     }
 }
+#endif

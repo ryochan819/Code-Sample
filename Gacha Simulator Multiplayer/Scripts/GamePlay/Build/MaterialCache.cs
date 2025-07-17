@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class MaterialCache
 {
-
     public Renderer renderer;
     public Material[] originalMaterials;
 

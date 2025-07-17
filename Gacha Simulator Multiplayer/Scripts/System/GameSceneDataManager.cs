@@ -12,6 +12,10 @@ namespace Gacha.system
 {
     public class GameSceneDataManager : NetworkBehaviour
     {
+        [Header("LocalPlayerData")]
+        PlayerController gameLocalPlayer;
+        public PlayerController LocalPlayer => gameLocalPlayer;
+
         [Header("MultiplayerData")]
         public SyncVar<bool> dataSynced = new(false);
         public SyncVar<List<PlayerDataNetwork>> multiplayerDatas;
@@ -46,7 +50,7 @@ namespace Gacha.system
             if (DataPersistenceManager.instance.SaveData.IsNewSave)
             {
                 dataSynced.value = true;
-                money = new(30000);
+                money.value = 30000;
                 return UniTask.CompletedTask;
             }
 
@@ -68,29 +72,47 @@ namespace Gacha.system
             return UniTask.CompletedTask;
         }
 
+        public void SetLocalPlayer(PlayerController player)
+        {
+            gameLocalPlayer = player;
+        }
+
+
         public void PlayerDataUpdate(string steamID, CC_CharacterDataNetwork characterData, PlayerID? playerID)
         {
-            // Find the existing data by SteamID
-            var existingData = multiplayerDatas.value.FirstOrDefault(data => data.SteamID == steamID);
+            var updatedList = new List<PlayerDataNetwork>(multiplayerDatas.value);
+            bool found = false;
 
-            if (existingData.SteamID == steamID)
+            for (int i = 0; i < updatedList.Count; i++)
             {
-                // Update the existing entry
-                existingData.characterData = characterData;
-                existingData.PlayerID = playerID.HasValue ? playerID.Value.id : (ushort)0;
-                Debug.Log("PlayerDataUpdated - existing entry updated");
+                if (updatedList[i].SteamID == steamID)
+                {
+                    updatedList[i] = new PlayerDataNetwork
+                    {
+                        SteamID = steamID,
+                        characterData = characterData,
+                        PlayerID = playerID.HasValue ? playerID.Value.id : (ushort)0
+                    };
+                    found = true;
+                    Debug.Log("PlayerDataUpdated - existing entry updated");
+                    break;
+                }
             }
-            else
+
+            if (!found)
             {
-                // Add new entry if not found
-                multiplayerDatas.value.Add(new PlayerDataNetwork
+                updatedList.Add(new PlayerDataNetwork
                 {
                     SteamID = steamID,
                     characterData = characterData,
                     PlayerID = playerID.HasValue ? playerID.Value.id : (ushort)0
                 });
+
                 Debug.Log("PlayerDataUpdated - new entry added");
             }
+
+            // ✅ Re-assign the whole list to trigger dirty flag
+            multiplayerDatas.value = updatedList;
         }
 
         public CC_CharacterDataNetwork GetPlayerCharacterData(ushort playerID)

@@ -24,6 +24,7 @@ namespace Gacha.ui
             public static readonly IGameSceneInfaceState idle = new GameSceneInfaceState_Idle();
             public static readonly IGameSceneInfaceState phone = new GameSceneInfaceState_Phone();
             public static readonly IGameSceneInfaceState build = new GameSceneInfaceState_Build();
+            public static readonly IGameSceneInfaceState gacha = new GameSceneInfaceState_Gacha();
         }
 
         void Awake()
@@ -70,5 +71,6 @@ namespace Gacha.ui
         public GameObject idleCanvas;
         public GameObject phoneCanvas;
         public GameObject buildCanvas;
+        public GameObject gachaCanvas;
     }
 }

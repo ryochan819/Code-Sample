@@ -1,5 +1,6 @@
 using System;
 using CC;
+using Gacha.system;
 using PurrNet;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -17,6 +18,8 @@ namespace Gacha.gameplay
         public PlayerControllerState PhoneState => phoneState;
         private PlayerControllerState buildState;
         public PlayerControllerState BuildState => buildState;
+        private PlayerControllerState gachaState;
+        public PlayerControllerState GachaState => gachaState;
 
         [Header("Base setup")]
         public float walkingSpeed = 7.5f;
@@ -30,6 +33,19 @@ namespace Gacha.gameplay
 
         [HideInInspector]
         public bool canMove = true;
+
+        [Header("Crouch setup")]
+        bool isCrouching = false;
+        public bool IsCrouching { get => isCrouching; set => isCrouching = value; }
+        float crouchHeight = 0.9f;
+        public float CrouchHeight => crouchHeight;
+        float standingHeight = 2.0f;
+        public float StandingHeight => standingHeight;
+
+        [SerializeField] BuildManager buildManager;
+        public BuildManager BuildManager => buildManager;
+        [SerializeField] InteractManager interactManager;
+        public InteractManager InteractManager => interactManager;
         [SerializeField] Animator animator;
         public Animator Animator => animator;
         [SerializeField] private float cameraYOffset = 1.75f;
@@ -37,12 +53,15 @@ namespace Gacha.gameplay
         [SerializeField] CinemachineCamera playerCamera;
         public CinemachineCamera PlayerCamera => playerCamera;
         [SerializeField] NetworkAnimator newWorkAnimator;
+        public NetworkAnimator NetAnimator => newWorkAnimator;
         [SerializeField] CharacterCustomization characterCustomization;
+
         void Awake()
         {
             idleState = new PlayerControllerState_Idle(this);
             phoneState = new PlayerControllerState_Phone(this);
             buildState = new PlayerControllerState_Building(this);
+            gachaState = new PlayerControllerState_Gacha(this);
         }
 
         protected override void OnSpawned(bool asServer)
@@ -56,6 +75,8 @@ namespace Gacha.gameplay
                 enabled = false;
                 return;
             }
+
+            GameSceneDataManager.instance.SetLocalPlayer(this);
 
             characterController = GetComponent<CharacterController>();
 
@@ -90,6 +111,12 @@ namespace Gacha.gameplay
                 case PlayerState.build:
                     SwitchState(BuildState);
                     break;
+                case PlayerState.gacha:
+                    SwitchState(GachaState);
+                    break;
+                default:
+                    Debug.LogWarning($"Unknown player state: {state}");
+                    break;
             }
         }
 
@@ -102,7 +129,14 @@ namespace Gacha.gameplay
 
         private void OnCharacterLoaded(CharacterCustomization script)
         {
-            playerCamera.transform.localPosition = new Vector3(0f, eyeLevel.position.y - gameObject.transform.position.y, 0.1f);
+            if (!isOwner)
+            {
+                enabled = false;
+                return;
+            }
+            
+            standingHeight = eyeLevel.position.y - gameObject.transform.position.y;
+            playerCamera.transform.localPosition = new Vector3(0f, standingHeight, 0.1f);
         }
 
         void OnEnable()
@@ -124,6 +158,7 @@ namespace Gacha.gameplay
     {
         idle,
         phone,
-        build
+        build,
+        gacha
     }
 }

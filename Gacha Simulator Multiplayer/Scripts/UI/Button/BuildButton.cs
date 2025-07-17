@@ -27,7 +27,7 @@ namespace Gacha.ui
             {
                 Debug.Log("Requirement met");
                 // Requirement met
-                BuildManager.Instance.StartBuildMode(buildScriptable);
+                GameSceneDataManager.instance.LocalPlayer.BuildManager.StartBuildMode(buildScriptable);
                 UIEventSystem.ClosePhoneMenu();
             }
             else

@@ -20,9 +20,6 @@ namespace Gacha.ui
 
             manager.UICanvases.phoneCanvas.SetActive(true);
 
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-
             RectTransform rt = manager.PhoneFrame.GetComponent<RectTransform>();
 
             Tween.UIAnchoredPosition(rt,

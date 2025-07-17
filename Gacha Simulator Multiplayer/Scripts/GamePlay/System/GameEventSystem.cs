@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Gacha.system;
 using UnityEngine;
 
 namespace Gacha.gameplay
@@ -113,6 +114,12 @@ namespace Gacha.gameplay
         public static void SwitchPlayerState(PlayerState state)
         {
             onSwitchPlayerState?.Invoke(state);
+        }
+
+        public static event Action<BlendMode, float> onCameraBlendUpdate;
+        public static void CameraBlendUpdate(BlendMode mode, float duration)
+        {
+            onCameraBlendUpdate?.Invoke(mode, duration);
         }
     }
 }

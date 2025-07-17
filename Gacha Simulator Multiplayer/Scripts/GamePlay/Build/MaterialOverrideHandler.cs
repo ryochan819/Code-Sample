@@ -1,29 +1,33 @@
 using System.Collections.Generic;
+using Gacha.system;
 using UnityEngine;
 
 public class MaterialOverrideHandler
 {
-    private List<MaterialCache> materialCacheList = new();
-
-    public void CacheOriginalMaterials(GameObject root)
+    public List<MaterialCache> materialCacheList;
+    public List<MaterialCache> CacheOriginalMaterials(GameObject root)
     {
-        materialCacheList.Clear();
-        foreach (var renderer in root.GetComponentsInChildren<Renderer>(true))
+        materialCacheList = new List<MaterialCache>();
+        foreach (var renderer in root.GetComponentsInChildren<Renderer>(false))
         {
             if (renderer.enabled)
             {
                 materialCacheList.Add(new MaterialCache(renderer));
             }
         }
+
+        return materialCacheList;
     }
 
-    public void ApplyOverrideMaterial(Material overrideMat)
+    public void ApplyOverrideMaterial(bool valid)
     {
+        Material overrideMaterial = valid ? GameReference.Instance.ValidPlacementMaterial : GameReference.Instance.InvalidPlacementMaterial;
+        
         foreach (var cache in materialCacheList)
         {
             var mats = new Material[cache.originalMaterials.Length];
             for (int i = 0; i < mats.Length; i++)
-                mats[i] = overrideMat;
+                mats[i] = overrideMaterial;
 
             cache.renderer.materials = mats;
         }
@@ -35,6 +39,7 @@ public class MaterialOverrideHandler
         {
             cache.Restore();
         }
+        ResetHandler();
     }
 
     public void ResetHandler()

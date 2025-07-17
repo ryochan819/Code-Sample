@@ -15,7 +15,7 @@ public class GachaCoinInsert : MonoBehaviour
 
     public bool AddCoins()
     {
-        if (gachaMachine.EnoughCoins())
+        if (gachaMachine.CapsuleToySetOnMachine != null || gachaMachine.EnoughCoins())
         {
             return false;
         }

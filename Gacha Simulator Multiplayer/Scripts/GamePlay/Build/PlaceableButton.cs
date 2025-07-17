@@ -29,7 +29,7 @@ namespace Gacha.ui
                 }
             }
 
-            BuildManager.Instance.StartBuildMode(buildScriptable);
+            GameSceneDataManager.instance.LocalPlayer.BuildManager.StartBuildMode(buildScriptable);
         }
 
         void OnDestroy()
