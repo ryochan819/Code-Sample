@@ -52,16 +52,16 @@ namespace Gacha.gameplay
         [SerializeField] Transform eyeLevel;
         [SerializeField] CinemachineCamera playerCamera;
         public CinemachineCamera PlayerCamera => playerCamera;
-        [SerializeField] NetworkAnimator newWorkAnimator;
-        public NetworkAnimator NetAnimator => newWorkAnimator;
+        [SerializeField] NetworkAnimator networkAnimator;
+        public NetworkAnimator NetAnimator => networkAnimator;
         [SerializeField] CharacterCustomization characterCustomization;
 
         void Awake()
         {
-            idleState = new PlayerControllerState_Idle(this);
-            phoneState = new PlayerControllerState_Phone(this);
-            buildState = new PlayerControllerState_Building(this);
-            gachaState = new PlayerControllerState_Gacha(this);
+            idleState ??= new PlayerControllerState_Idle(this);
+            phoneState ??= new PlayerControllerState_Phone(this);
+            buildState ??= new PlayerControllerState_Building(this);
+            gachaState ??= new PlayerControllerState_Gacha(this);
         }
 
         protected override void OnSpawned(bool asServer)
@@ -127,11 +127,10 @@ namespace Gacha.gameplay
             currentState.EnterState();
         }
 
-        private void OnCharacterLoaded(CharacterCustomization script)
+        private void OnCharacterCustomizationLoaded(CharacterCustomization script)
         {
             if (!isOwner)
             {
-                enabled = false;
                 return;
             }
             
@@ -142,15 +141,13 @@ namespace Gacha.gameplay
         void OnEnable()
         {
             GameEventSystem.onSwitchPlayerState += SwitchPlayerState;
-            if (characterCustomization)
-                characterCustomization.onCharacterLoaded += OnCharacterLoaded;
+            characterCustomization.onCharacterLoaded += OnCharacterCustomizationLoaded;
         }
 
         void OnDisable()
         {
             GameEventSystem.onSwitchPlayerState -= SwitchPlayerState;
-            if (characterCustomization)
-                characterCustomization.onCharacterLoaded -= OnCharacterLoaded;
+            characterCustomization.onCharacterLoaded -= OnCharacterCustomizationLoaded;
         }
     }
 
