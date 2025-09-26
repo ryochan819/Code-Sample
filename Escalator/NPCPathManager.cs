@@ -41,7 +41,7 @@ public class NPCPathManager : MonoBehaviour
         }
 
         // Special case: from -1 to 1 (or 1 to -1) → use 0 as middle
-        // replace with validatepath later
+        // replace with Dijkstra Algorithm later
         if (entranceFloor == -1 && exitFloor == 1)
         {
             escalator = escalators.FirstOrDefault(e => e.EntranceFloorLevel == -1 && e.ExitFloorLevel == 0);
@@ -54,12 +54,11 @@ public class NPCPathManager : MonoBehaviour
         }
     }
 
-    // ***Add path validation later, npc validate path when not standing on the target platform
-    public bool ValidatePath(int currentLevel, Transform currentPlatform, int targetLevel, Transform targetPlatform)
+    // ***Find shortest path with Dijkstra Algorithm, weight affected by current queue count
+    public bool GetNpcPath(int currentLevel, Transform currentPlatform, int targetLevel, Transform targetPlatform)
     {
-        // First check if any escalator exit is connected to the target platform to list
-        // Then check next level until return to current level
-        // Return closest escalator path from list
+        // cache path result to reduce calls
+        // npc check caches first and find optimal options to reach each platform
         return true;
     }
 }
